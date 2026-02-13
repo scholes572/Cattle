@@ -1,14 +1,14 @@
 [
   {
     "id": "1",
-    "username": "lovegah",
-    "password": "lovegah123",
+    "username": "lovega",
+    "password": "lovega123",
     "role": "admin"
   },
   {
     "id": "2",
-    "username": "farmer2",
-    "password": "farmer2123",
+    "username": "lazarus",
+    "password": "lazarus123",
     "role": "admin"
   }
 ]
