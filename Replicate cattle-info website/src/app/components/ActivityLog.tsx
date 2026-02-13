@@ -27,7 +27,7 @@ export function ActivityLog() {
 
   const fetchActivities = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/activities`);
+      const response = await fetch(`${API_URL}/activities`);
       const text = await response.text();
       try {
         const data = JSON.parse(text);
@@ -51,7 +51,7 @@ export function ActivityLog() {
     if (!confirm("Are you sure you want to clear all activity logs?")) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/activities`, {
+      const response = await fetch(`${API_URL}/activities`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
