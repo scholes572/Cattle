@@ -118,21 +118,6 @@ export function Login() {
               )}
             </Button>
           </form>
-          
-          {/* Demo Accounts */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-100">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-              Demo Accounts
-            </p>
-            <div className="space-y-1">
-              <p className="font-mono text-sm text-gray-700">
-                <span className="text-green-600 font-semibold">lovegah</span> / lovegah123
-              </p>
-              <p className="font-mono text-sm text-gray-700">
-                <span className="text-green-600 font-semibold">farmer2</span> / farmer2123
-              </p>
-            </div>
-          </div>
         </CardContent>
       </Card>
       
