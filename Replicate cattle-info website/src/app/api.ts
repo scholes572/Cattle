@@ -1,5 +1,5 @@
 // Local API configuration
-export const API_URL = 'http://localhost:3001/api';
+export const API_URL = 'https://cattle-zqth.onrender.com/api';
 
 // Get auth token from localStorage
 export function getAuthToken(): string | null {
