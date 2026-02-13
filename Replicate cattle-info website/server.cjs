@@ -168,11 +168,26 @@ app.delete('/api/activities', (req, res) => {
   res.json({ success: true, message: 'Activity log cleared' });
 });
 
+// Get base URL dynamically
+function getBaseUrl(req) {
+  return `${req.protocol}://${req.get('host')}`;
+}
+
+// Helper to fix image URLs
+function fixImageUrls(cattle, req) {
+  const baseUrl = getBaseUrl(req);
+  return cattle.map(cow => ({
+    ...cow,
+    imageUrl: cow.imagePath ? `${baseUrl}/uploads/${cow.imagePath}` : null
+  }));
+}
+
 // ==================== Cattle endpoints ====================
 
 app.get('/api/cattle', (req, res) => {
   const cattle = readJson(CATTLE_FILE);
-  res.json({ success: true, cattle });
+  const fixedCattle = fixImageUrls(cattle, req);
+  res.json({ success: true, cattle: fixedCattle });
 });
 
 app.get('/api/cattle/:id', (req, res) => {
@@ -181,7 +196,8 @@ app.get('/api/cattle/:id', (req, res) => {
   if (!cow) {
     return res.status(404).json({ success: false, error: 'Cattle not found' });
   }
-  res.json({ success: true, cattle: cow });
+  const fixedCow = fixImageUrls([cow], req)[0];
+  res.json({ success: true, cattle: fixedCow });
 });
 
 app.post('/api/cattle', (req, res) => {

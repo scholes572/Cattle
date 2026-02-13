@@ -12,7 +12,6 @@
     "notes": "Excellent milk producer, calm temperament",
     "createdAt": "2026-02-12T16:24:39.572Z",
     "updatedAt": "2026-02-12T19:58:01.834Z",
-    "imageUrl": "http://localhost:3001/uploads/1770916681532-gygr8nega.jpg",
     "imagePath": "1770916681532-gygr8nega.jpg"
   },
   {
@@ -29,7 +28,6 @@
     "notes": "Strong breeding bull with excellent genetics",
     "createdAt": "2026-02-12T16:24:39.572Z",
     "updatedAt": "2026-02-12T17:32:41.158Z",
-    "imageUrl": "http://localhost:3001/uploads/1770917561133-dwjmxnvy9.jpeg",
     "imagePath": "1770917561133-dwjmxnvy9.jpeg"
   },
   {
@@ -46,7 +44,6 @@
     "notes": "High butterfat milk content",
     "createdAt": "2026-02-12T16:24:39.572Z",
     "updatedAt": "2026-02-12T19:32:23.612Z",
-    "imageUrl": "http://localhost:3001/uploads/1770922948123-55nm0rpx3.jpeg",
     "imagePath": "1770922948123-55nm0rpx3.jpeg"
   },
   {
@@ -64,7 +61,6 @@
     "notes": "",
     "createdAt": "2026-02-12T19:46:54.143Z",
     "updatedAt": "2026-02-12T19:53:29.145Z",
-    "imageUrl": "http://localhost:3001/uploads/1770925649496-bdea2u6ie.jpeg",
     "imagePath": "1770925649496-bdea2u6ie.jpeg"
   }
 ]
