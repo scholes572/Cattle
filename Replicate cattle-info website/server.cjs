@@ -170,7 +170,9 @@ app.delete('/api/activities', (req, res) => {
 
 // Get base URL dynamically
 function getBaseUrl(req) {
-  return `${req.protocol}://${req.get('host')}`;
+  // Use HTTPS if request is secure or if deployed on Render
+  const protocol = req.get('x-forwarded-proto') || req.protocol;
+  return `${protocol}://${req.get('host')}`;
 }
 
 // Helper to fix image URLs
