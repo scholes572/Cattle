@@ -1,5 +1,21 @@
 [
   {
+    "id": "1771005734139-8kzssqq60",
+    "userId": "2",
+    "username": "lazarus",
+    "action": "LOGIN",
+    "details": "User logged in",
+    "timestamp": "2026-02-13T18:02:14.139Z"
+  },
+  {
+    "id": "1771005725531-gwb4cbjjm",
+    "userId": "1",
+    "username": "lovega",
+    "action": "LOGIN",
+    "details": "User logged in",
+    "timestamp": "2026-02-13T18:02:05.531Z"
+  },
+  {
     "id": "1770994216951-phfvhp0kv",
     "userId": "1",
     "username": "lovegah",

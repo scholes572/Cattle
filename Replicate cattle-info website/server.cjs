@@ -46,8 +46,8 @@ if (!fs.existsSync(DATA_DIR)) {
 function initializeUsers() {
   if (!fs.existsSync(USERS_FILE)) {
     const users = [
-      { id: '1', username: 'lovegah', password: 'lovegah123', role: 'admin' },
-      { id: '2', username: 'farmer2', password: 'farmer2123', role: 'admin' }
+      { id: '1', username: 'lovega', password: 'lovega123', role: 'admin' },
+      { id: '2', username: 'lazarus', password: 'lazarus123', role: 'admin' }
     ];
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
   }
