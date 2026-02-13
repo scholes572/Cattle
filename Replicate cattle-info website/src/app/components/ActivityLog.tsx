@@ -28,9 +28,17 @@ export function ActivityLog() {
   const fetchActivities = async () => {
     try {
       const response = await fetch(`${API_URL}/api/activities`);
-      const data = await response.json();
-      if (data.success) {
-        setActivities(data.activities);
+      const text = await response.text();
+      try {
+        const data = JSON.parse(text);
+        if (data.success) {
+          setActivities(data.activities);
+        } else {
+          toast.error(data.error || "Failed to load activity log");
+        }
+      } catch {
+        console.error('Invalid JSON response:', text);
+        toast.error("Invalid response from server");
       }
     } catch (error) {
       console.error('Failed to fetch activities:', error);
