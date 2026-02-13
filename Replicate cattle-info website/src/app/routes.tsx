@@ -12,21 +12,27 @@ import { ActivityLog } from "./components/ActivityLog";
 import { Login } from "./components/Login";
 import { Signup } from "./components/Signup";
 import { NotFound } from "./components/NotFound";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: Root,
     children: [
-      { index: true, Component: HomePage },
-      { path: "cattle", Component: CattleList },
-      { path: "cattle/add", Component: AddCattle },
-      { path: "cattle/:id", Component: CattleDetail },
-      { path: "breeds", Component: BreedsPage },
-      { path: "milk", Component: MilkList },
-      { path: "milk/add", Component: MilkProduction },
-      { path: "data", Component: DataPage },
-      { path: "activity", Component: ActivityLog },
+      {
+        Component: ProtectedRoute,
+        children: [
+          { index: true, Component: HomePage },
+          { path: "cattle", Component: CattleList },
+          { path: "cattle/add", Component: AddCattle },
+          { path: "cattle/:id", Component: CattleDetail },
+          { path: "breeds", Component: BreedsPage },
+          { path: "milk", Component: MilkList },
+          { path: "milk/add", Component: MilkProduction },
+          { path: "data", Component: DataPage },
+          { path: "activity", Component: ActivityLog },
+        ],
+      },
       { path: "*", Component: NotFound },
     ],
   },
