@@ -14,7 +14,7 @@ interface Activity {
   timestamp: string;
 }
 
-const API_URL = 'http://localhost:3001';
+import { API_URL } from "../api";
 
 export function ActivityLog() {
   const { token } = useAuth();
