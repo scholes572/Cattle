@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { API_URL } from "../api";
+import { authApi } from "../supabase";
 
 interface User {
   id: string;
@@ -36,21 +36,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (username: string, password: string) => {
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await response.json();
+      const response = await authApi.login(username, password);
       
-      if (data.success) {
-        setToken(data.token);
-        setUser(data.user);
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+      if (response.success && response.token) {
+        setToken(response.token);
+        setUser(response.user);
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
         return { error: null };
       } else {
-        return { error: new Error(data.error || 'Login failed') };
+        return { error: new Error(response.error || 'Login failed') };
       }
     } catch (error) {
       return { error: new Error('Network error') };

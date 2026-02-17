@@ -228,7 +228,10 @@ app.post('/api/cattle', (req, res) => {
         newCattle.status ? `Status: ${newCattle.status}` : null,
       ].filter(Boolean).join(', ');
       logActivity(decoded.id, decoded.username, 'ADD_CATTLE', `Added new cattle: ${newCattle.name || newCattle.tagNumber} (${details})`);
-    } catch {}
+      console.log('Activity logged: ADD_CATTLE for', newCattle.name || newCattle.tagNumber);
+    } catch (err) {
+      console.error('Failed to log ADD_CATTLE activity:', err.message);
+    }
   }
   
   res.json({ success: true, cattle: newCattle });
@@ -271,7 +274,10 @@ app.put('/api/cattle/:id', (req, res) => {
       } else {
         logActivity(decoded.id, decoded.username, 'UPDATE_CATTLE', `${cattleName}: details updated`);
       }
-    } catch {}
+      console.log('Activity logged: UPDATE_CATTLE for', cattleName);
+    } catch (err) {
+      console.error('Failed to log UPDATE_CATTLE activity:', err.message);
+    }
   }
   
   res.json({ success: true, cattle: cattle[index] });
@@ -298,7 +304,10 @@ app.delete('/api/cattle/:id', (req, res) => {
         deleted.status ? `Status: ${deleted.status}` : null,
       ].filter(Boolean).join(', ');
       logActivity(decoded.id, decoded.username, 'DELETE_CATTLE', `Deleted cattle: ${deleted.name || deleted.tagNumber} (${details})`);
-    } catch {}
+      console.log('Activity logged: DELETE_CATTLE for', deleted.name || deleted.tagNumber);
+    } catch (err) {
+      console.error('Failed to log DELETE_CATTLE activity:', err.message);
+    }
   }
   
   res.json({ success: true, cattle: deleted });
@@ -318,6 +327,10 @@ app.get('/api/milk/cattle/:cattleId', (req, res) => {
 });
 
 app.post('/api/milk', (req, res) => {
+  console.log('POST /api/milk called');
+  console.log('Request body:', req.body);
+  console.log('Auth header:', req.headers.authorization ? 'present' : 'missing');
+  
   const milk = readJson(MILK_FILE);
   const id = `milk-${generateId()}`;
   const newRecord = {
@@ -327,6 +340,7 @@ app.post('/api/milk', (req, res) => {
   };
   milk.push(newRecord);
   writeJson(MILK_FILE, milk);
+  console.log('Milk record saved, total records:', milk.length);
   
   // Log activity
   const authHeader = req.headers.authorization;
@@ -338,7 +352,10 @@ app.post('/api/milk', (req, res) => {
       const morning = req.body.morningLiters || 0;
       const evening = req.body.eveningLiters || 0;
       logActivity(decoded.id, decoded.username, 'ADD_MILK', `Recorded milk for ${cowName}: ${morning}L (morning) + ${evening}L (evening) = ${req.body.totalLiters}L on ${req.body.date}`);
-    } catch {}
+      console.log('Activity logged: ADD_MILK for', cowName);
+    } catch (err) {
+      console.error('Failed to log ADD_MILK activity:', err.message);
+    }
   }
   
   res.json({ success: true, record: newRecord });
@@ -361,7 +378,10 @@ app.delete('/api/milk/:id', (req, res) => {
       const decoded = jwt.verify(token, JWT_SECRET);
       const cowName = deleted.cattleName || deleted.cattleTagNumber;
       logActivity(decoded.id, decoded.username, 'DELETE_MILK', `Deleted milk record for ${cowName}: ${deleted.morningLiters}L (morning) + ${deleted.eveningLiters}L (evening) = ${deleted.totalLiters}L on ${deleted.date}`);
-    } catch {}
+      console.log('Activity logged: DELETE_MILK for', cowName);
+    } catch (err) {
+      console.error('Failed to log DELETE_MILK activity:', err.message);
+    }
   }
   
   res.json({ success: true, record: deleted });

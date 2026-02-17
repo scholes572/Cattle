@@ -19,8 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { API_URL } from "../api";
-import { useAuth } from "./AuthProvider";
+import { milkApi, getAuthToken } from "../api";
 import { toast } from "sonner";
 
 interface MilkProduction {
@@ -43,7 +42,6 @@ interface DailyTotal {
 }
 
 export function MilkList() {
-  const { token } = useAuth();
   const [milkRecords, setMilkRecords] = useState<MilkProduction[]>([]);
   const [dailyTotals, setDailyTotals] = useState<DailyTotal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,10 +55,9 @@ export function MilkList() {
 
   const fetchMilkRecords = async () => {
     try {
-      const response = await fetch(`${API_URL}/milk`);
-      const data = await response.json();
-      if (data.success) {
-        const records = data.records || [];
+      const response = await milkApi.getAll();
+      if (response.success) {
+        const records = response.records || [];
         setMilkRecords(records);
         calculateDailyTotals(records);
         calculateTotalProduction(records);
@@ -103,15 +100,8 @@ export function MilkList() {
     if (!confirm("Are you sure you want to delete this record?")) return;
 
     try {
-      const response = await fetch(`${API_URL}/milk/${id}`, {
-        method: "DELETE",
-        headers: {
-          ...(token && { "Authorization": `Bearer ${token}` }),
-        },
-      });
-
-      const data = await response.json();
-      if (data.success) {
+      const response = await milkApi.delete(id);
+      if (response.success) {
         toast.success("Record deleted successfully");
         fetchMilkRecords();
       } else {

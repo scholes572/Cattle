@@ -7,8 +7,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
-import { API_URL } from "../api";
-import { useAuth } from "./AuthProvider";
+import { cattleApi } from "../api";
 import { toast } from "sonner";
 
 const commonBreeds = [
@@ -28,7 +27,6 @@ const commonBreeds = [
 
 export function AddCattle() {
   const navigate = useNavigate();
-  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     tagNumber: "",
@@ -53,25 +51,16 @@ export function AddCattle() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/cattle`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { "Authorization": `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          ...formData,
-          weight: formData.weight ? parseFloat(formData.weight) : undefined,
-        }),
+      const response = await cattleApi.create({
+        ...formData,
+        weight: formData.weight ? parseFloat(formData.weight) : undefined,
       });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         toast.success("Cattle added successfully!");
         navigate("/cattle");
       } else {
-        toast.error("Failed to add cattle: " + data.error);
+        toast.error("Failed to add cattle: " + response.error);
       }
     } catch (error) {
       toast.error("Failed to add cattle");

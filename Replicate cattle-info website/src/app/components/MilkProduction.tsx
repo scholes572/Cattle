@@ -7,8 +7,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
-import { API_URL } from "../api";
-import { useAuth } from "./AuthProvider";
+import { cattleApi, milkApi } from "../api";
 import { toast } from "sonner";
 
 interface Cattle {
@@ -43,7 +42,6 @@ interface MilkProduction {
 }
 
 export function MilkProduction() {
-  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [cattle, setCattle] = useState<Cattle[]>([]);
   const [formData, setFormData] = useState({
@@ -60,11 +58,10 @@ export function MilkProduction() {
 
   const fetchCattle = async () => {
     try {
-      const response = await fetch(`${API_URL}/cattle`);
-      const data = await response.json();
-      if (data.success) {
+      const response = await cattleApi.getAll();
+      if (response.success) {
         // Filter only female cattle (cows)
-        const femaleCattle = (data.cattle || []).filter((c: Cattle) => c.gender === "female");
+        const femaleCattle = (response.cattle || []).filter((c: any) => c.gender === "female");
         setCattle(femaleCattle);
       }
     } catch (error) {
@@ -88,27 +85,18 @@ export function MilkProduction() {
     const totalLiters = morning + evening;
 
     try {
-      const response = await fetch(`${API_URL}/milk`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { "Authorization": `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          cattleId: formData.cattleId,
-          cattleName: selectedCattle.name,
-          cattleTagNumber: selectedCattle.tagNumber,
-          date: formData.date,
-          morningLiters: morning,
-          eveningLiters: evening,
-          totalLiters,
-          notes: formData.notes,
-        }),
+      const response = await milkApi.create({
+        cattleId: formData.cattleId,
+        cattleName: selectedCattle.name,
+        cattleTagNumber: selectedCattle.tagNumber,
+        date: formData.date,
+        morningLiters: morning,
+        eveningLiters: evening,
+        totalLiters,
+        notes: formData.notes,
       });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         toast.success("Milk production recorded successfully!");
         setFormData({
           cattleId: "",
@@ -118,7 +106,7 @@ export function MilkProduction() {
           notes: "",
         });
       } else {
-        toast.error("Failed to record milk production: " + data.error);
+        toast.error("Failed to record milk production: " + response.error);
       }
     } catch (error) {
       toast.error("Failed to record milk production");

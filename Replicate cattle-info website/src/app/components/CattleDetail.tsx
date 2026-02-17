@@ -19,8 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "./ui/alert-dialog";
-import { API_URL } from "../api";
-import { useAuth } from "./AuthProvider";
+import { cattleApi, milkApi } from "../api";
 import { toast } from "sonner";
 
 interface Cattle {
@@ -45,7 +44,6 @@ interface Cattle {
 export function CattleDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
   const [cattle, setCattle] = useState<Cattle | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -65,11 +63,10 @@ export function CattleDetail() {
   useEffect(() => {
     const fetchCattle = async () => {
       try {
-        const response = await fetch(`${API_URL}/cattle/${id}`);
-        const data = await response.json();
-        if (data.success) {
-          setCattle(data.cattle);
-          setFormData(data.cattle);
+        const response = await cattleApi.getById(id || '');
+        if (response.success && response.cattle) {
+          setCattle(response.cattle as Cattle);
+          setFormData(response.cattle);
         } else {
           toast.error("Cattle not found");
           navigate("/cattle");
@@ -90,10 +87,9 @@ export function CattleDetail() {
 
   const fetchMilkRecords = async () => {
     try {
-      const response = await fetch(`${API_URL}/milk/cattle/${id}`);
-      const data = await response.json();
-      if (data.success) {
-        setMilkRecords(data.records || []);
+      const response = await milkApi.getByCattleId(id || '');
+      if (response.success) {
+        setMilkRecords(response.records || []);
       }
     } catch (error) {
       console.error("Failed to fetch milk records:", error);
@@ -107,26 +103,18 @@ export function CattleDetail() {
     const totalLiters = morning + evening;
 
     try {
-      const response = await fetch(`${API_URL}/milk`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { "Authorization": `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          cattleId: id,
-          cattleName: cattle?.name,
-          cattleTagNumber: cattle?.tagNumber,
-          date: milkFormData.date,
-          morningLiters: morning,
-          eveningLiters: evening,
-          totalLiters,
-          notes: milkFormData.notes,
-        }),
+      const response = await milkApi.create({
+        cattleId: id,
+        cattleName: cattle?.name,
+        cattleTagNumber: cattle?.tagNumber,
+        date: milkFormData.date,
+        morningLiters: morning,
+        eveningLiters: evening,
+        totalLiters,
+        notes: milkFormData.notes,
       });
 
-      const data = await response.json();
-      if (data.success) {
+      if (response.success) {
         toast.success("Milk production recorded!");
         setShowMilkForm(false);
         setMilkFormData({
@@ -137,7 +125,7 @@ export function CattleDetail() {
         });
         fetchMilkRecords();
       } else {
-        toast.error("Failed to record milk: " + data.error);
+        toast.error("Failed to record milk: " + response.error);
       }
     } catch (error) {
       toast.error("Failed to record milk production");
@@ -149,26 +137,17 @@ export function CattleDetail() {
     setSaving(true);
 
     try {
-      const response = await fetch(`${API_URL}/cattle/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { "Authorization": `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          ...formData,
-          weight: formData.weight ? parseFloat(formData.weight.toString()) : undefined,
-        }),
+      const response = await cattleApi.update(id || '', {
+        ...formData,
+        weight: formData.weight ? parseFloat(formData.weight.toString()) : undefined,
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setCattle(data.cattle);
-        setFormData(data.cattle);
+      if (response.success) {
+        setCattle(response.cattle as Cattle);
+        setFormData(response.cattle);
         toast.success("Cattle updated successfully!");
       } else {
-        toast.error("Failed to update cattle: " + data.error);
+        toast.error("Failed to update cattle: " + response.error);
       }
     } catch (error) {
       console.error("Failed to update cattle:", error);

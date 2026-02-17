@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Download, Upload, Database, FileJson, FileSpreadsheet, Archive, AlertCircle, CheckCircle } from "lucide-react";
+import { Download, Upload, Database, FileJson, FileSpreadsheet, AlertCircle, CheckCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Alert, AlertDescription } from "./ui/alert";
-import { API_URL } from "../api";
+import { cattleApi, milkApi } from "../api";
 
 export function DataPage() {
   const [exporting, setExporting] = useState<string | null>(null);
@@ -18,9 +18,9 @@ export function DataPage() {
   const exportCattleJson = async () => {
     setExporting('cattle-json');
     try {
-      const response = await fetch(`${API_URL}/export/cattle/json`);
-      if (response.ok) {
-        const blob = await response.blob();
+      const response = await cattleApi.getAll();
+      if (response.success) {
+        const blob = new Blob([JSON.stringify(response.cattle, null, 2)], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -42,9 +42,26 @@ export function DataPage() {
   const exportCattleCsv = async () => {
     setExporting('cattle-csv');
     try {
-      const response = await fetch(`${API_URL}/export/cattle/csv`);
-      if (response.ok) {
-        const blob = await response.blob();
+      const response = await cattleApi.getAll();
+      if (response.success && response.cattle) {
+        // Convert to CSV
+        const cattle = response.cattle as any[];
+        if (cattle.length === 0) {
+          showMessage('error', 'No cattle data to export');
+          setExporting(null);
+          return;
+        }
+        
+        const headers = ['id', 'tagNumber', 'name', 'breed', 'gender', 'dateOfBirth', 'weight', 'color', 'status', 'notes'];
+        const csvContent = [
+          headers.join(','),
+          ...cattle.map(c => headers.map(h => {
+            const val = c[h] || '';
+            return `"${String(val).replace(/"/g, '""')}"`;
+          }).join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -66,9 +83,9 @@ export function DataPage() {
   const exportMilkJson = async () => {
     setExporting('milk-json');
     try {
-      const response = await fetch(`${API_URL}/export/milk/json`);
-      if (response.ok) {
-        const blob = await response.blob();
+      const response = await milkApi.getAll();
+      if (response.success) {
+        const blob = new Blob([JSON.stringify(response.records, null, 2)], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -90,9 +107,25 @@ export function DataPage() {
   const exportMilkCsv = async () => {
     setExporting('milk-csv');
     try {
-      const response = await fetch(`${API_URL}/export/milk/csv`);
-      if (response.ok) {
-        const blob = await response.blob();
+      const response = await milkApi.getAll();
+      if (response.success && response.records) {
+        const records = response.records as any[];
+        if (records.length === 0) {
+          showMessage('error', 'No milk data to export');
+          setExporting(null);
+          return;
+        }
+        
+        const headers = ['id', 'cattleId', 'cattleName', 'cattleTagNumber', 'date', 'morningLiters', 'eveningLiters', 'totalLiters', 'notes'];
+        const csvContent = [
+          headers.join(','),
+          ...records.map(r => headers.map(h => {
+            const val = r[h] || '';
+            return `"${String(val).replace(/"/g, '""')}"`;
+          }).join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -111,58 +144,37 @@ export function DataPage() {
     setExporting(null);
   };
 
-  const downloadBackup = async () => {
-    setExporting('backup');
-    try {
-      const response = await fetch(`${API_URL}/backup`);
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `cattle-info-backup-${new Date().toISOString().split('T')[0]}.zip`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        showMessage('success', 'Full backup downloaded successfully (includes all data and images)');
-      } else {
-        showMessage('error', 'Failed to download backup');
-      }
-    } catch (error) {
-      showMessage('error', 'Error downloading backup');
-    }
-    setExporting(null);
-  };
-
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setImporting(true);
-    const formData = new FormData();
-    formData.append('file', file);
-
+    
     try {
-      const response = await fetch(`${API_URL}/import`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        showMessage('success', result.message);
-        // Refresh the page after successful import
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      if (Array.isArray(data)) {
+        // Determine if it's cattle or milk data based on fields
+        if (data.length > 0 && data[0].tagNumber) {
+          // Cattle data - import each item
+          for (const item of data) {
+            await cattleApi.create(item);
+          }
+          showMessage('success', `Imported ${data.length} cattle records`);
+        } else if (data.length > 0 && data[0].cattleId) {
+          // Milk data - import each item (would need to adapt for Supabase)
+          showMessage('error', 'Milk import not yet supported - please add records manually');
+        } else {
+          showMessage('error', 'Unknown data format');
+        }
       } else {
-        showMessage('error', result.error || 'Failed to import data');
+        showMessage('error', 'Invalid file format');
       }
     } catch (error) {
-      showMessage('error', 'Error importing data');
+      showMessage('error', 'Error importing data: ' + (error as Error).message);
     }
+    
     setImporting(false);
     // Reset file input
     event.target.value = '';
@@ -171,7 +183,7 @@ export function DataPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Data Management</h1>
-      <p className="text-gray-600 mb-8">Export, backup, and restore your cattle management data</p>
+      <p className="text-gray-600 mb-8">Export and backup your cattle management data</p>
 
       {message && (
         <Alert variant={message.type === 'success' ? 'default' : 'destructive'} className="mb-6">
@@ -193,7 +205,7 @@ export function DataPage() {
           <CardContent className="flex flex-col gap-3">
             <Button
               onClick={exportCattleJson}
-              disabled={exporting === 'cattle-json' || exporting === 'backup'}
+              disabled={exporting === 'cattle-json'}
               className="w-full"
             >
               <Download className="h-4 w-4 mr-2" />
@@ -201,7 +213,7 @@ export function DataPage() {
             </Button>
             <Button
               onClick={exportCattleCsv}
-              disabled={exporting === 'cattle-csv' || exporting === 'backup'}
+              disabled={exporting === 'cattle-csv'}
               variant="outline"
               className="w-full"
             >
@@ -223,7 +235,7 @@ export function DataPage() {
           <CardContent className="flex flex-col gap-3">
             <Button
               onClick={exportMilkJson}
-              disabled={exporting === 'milk-json' || exporting === 'backup'}
+              disabled={exporting === 'milk-json'}
               className="w-full"
             >
               <Download className="h-4 w-4 mr-2" />
@@ -231,36 +243,12 @@ export function DataPage() {
             </Button>
             <Button
               onClick={exportMilkCsv}
-              disabled={exporting === 'milk-csv' || exporting === 'backup'}
+              disabled={exporting === 'milk-csv'}
               variant="outline"
               className="w-full"
             >
               <FileSpreadsheet className="h-4 w-4 mr-2" />
               {exporting === 'milk-csv' ? 'Exporting...' : 'Export as CSV'}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Full Backup */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Archive className="h-5 w-5 text-purple-600" />
-              Full Backup
-            </CardTitle>
-            <CardDescription>
-              Download a complete backup of all your data including cattle records, milk production data, and images
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={downloadBackup}
-              disabled={exporting === 'backup' || importing}
-              className="w-full"
-              size="lg"
-            >
-              <Download className="h-5 w-5 mr-2" />
-              {exporting === 'backup' ? 'Creating Backup...' : 'Download Complete Backup (ZIP)'}
             </Button>
           </CardContent>
         </Card>
@@ -273,36 +261,36 @@ export function DataPage() {
               Import Data
             </CardTitle>
             <CardDescription>
-              Restore data from a backup file (JSON or ZIP format). This will replace existing data.
+              Import cattle data from a JSON file
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Alert variant="destructive" className="mb-4">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Warning: Importing will replace all existing data. Make sure to create a backup first.
+                Warning: Importing will add new records. Make sure to export your current data first.
               </AlertDescription>
             </Alert>
             <div className="flex items-center gap-4">
               <label htmlFor="import-file" className="cursor-pointer">
                 <Button
-                  disabled={importing || exporting === 'backup'}
+                  disabled={importing}
                   className="flex items-center gap-2"
                 >
                   <Upload className="h-4 w-4" />
-                  {importing ? 'Importing...' : 'Select Backup File'}
+                  {importing ? 'Importing...' : 'Select JSON File'}
                 </Button>
                 <input
                   id="import-file"
                   type="file"
-                  accept=".json,.zip"
+                  accept=".json"
                   onChange={handleImport}
                   className="hidden"
-                  disabled={importing || exporting === 'backup'}
+                  disabled={importing}
                 />
               </label>
               <span className="text-sm text-gray-500">
-                Supported formats: JSON (.json), ZIP archives (.zip)
+                Supported format: JSON (.json)
               </span>
             </div>
           </CardContent>

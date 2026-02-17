@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "./AuthProvider";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Trash2, User, Calendar, Activity } from "lucide-react";
 import { toast } from "sonner";
+import { activityApi } from "../api";
 
-interface Activity {
+interface ActivityLogEntry {
   id: string;
   userId: string;
   username: string;
@@ -14,11 +14,8 @@ interface Activity {
   timestamp: string;
 }
 
-import { API_URL } from "../api";
-
 export function ActivityLog() {
-  const { token } = useAuth();
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<ActivityLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,18 +24,11 @@ export function ActivityLog() {
 
   const fetchActivities = async () => {
     try {
-      const response = await fetch(`${API_URL}/activities`);
-      const text = await response.text();
-      try {
-        const data = JSON.parse(text);
-        if (data.success) {
-          setActivities(data.activities);
-        } else {
-          toast.error(data.error || "Failed to load activity log");
-        }
-      } catch {
-        console.error('Invalid JSON response:', text);
-        toast.error("Invalid response from server");
+      const response = await activityApi.getAll();
+      if (response.success) {
+        setActivities((response.activities || []) as ActivityLogEntry[]);
+      } else {
+        toast.error(response.error || "Failed to load activity log");
       }
     } catch (error) {
       console.error('Failed to fetch activities:', error);
@@ -51,14 +41,8 @@ export function ActivityLog() {
     if (!confirm("Are you sure you want to clear all activity logs?")) return;
 
     try {
-      const response = await fetch(`${API_URL}/activities`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (data.success) {
+      const response = await activityApi.clear();
+      if (response.success) {
         setActivities([]);
         toast.success("Activity log cleared");
       } else {
