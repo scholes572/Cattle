@@ -340,7 +340,7 @@ export function CattleDetail() {
                     <img
                       src={imagePreview || cattle.imageUrl}
                       alt={cattle.name || cattle.tagNumber}
-                      className="w-full h-48 md:h-64 object-cover rounded-lg cursor-pointer"
+                      className="w-full h-64 md:h-80 object-cover rounded-lg cursor-pointer"
                       onClick={() => window.open(imagePreview || cattle.imageUrl, '_blank')}
                     />
                     <Button

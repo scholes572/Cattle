@@ -159,7 +159,7 @@ export function CattleList() {
           {filteredCattle.map((animal) => (
             <Card key={animal.id} className="hover:shadow-lg transition-shadow overflow-hidden">
               {animal.imageUrl && (
-                <div className="h-32 sm:h-40 md:h-48 w-full overflow-hidden bg-gray-100">
+                <div className="h-40 sm:h-48 md:h-56 w-full overflow-hidden bg-gray-100">
                   <img
                     src={animal.imageUrl}
                     alt={animal.name || animal.tagNumber}
