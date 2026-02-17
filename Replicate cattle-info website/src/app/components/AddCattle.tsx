@@ -12,6 +12,7 @@ import { toast } from "sonner";
 
 const commonBreeds = [
   "Holstein",
+  "Fresian",
   "Jersey",
   "Angus",
   "Hereford",
@@ -29,12 +30,10 @@ export function AddCattle() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    tagNumber: "",
     name: "",
     breed: "",
     gender: "",
     dateOfBirth: "",
-    weight: "",
     color: "",
     status: "active",
     sire: "",
@@ -51,10 +50,7 @@ export function AddCattle() {
     setLoading(true);
 
     try {
-      const response = await cattleApi.create({
-        ...formData,
-        weight: formData.weight ? parseFloat(formData.weight) : undefined,
-      });
+      const response = await cattleApi.create(formData);
 
       if (response.success) {
         toast.success("Cattle added successfully!");
@@ -91,17 +87,6 @@ export function AddCattle() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="tagNumber">Tag Number *</Label>
-                <Input
-                  id="tagNumber"
-                  required
-                  value={formData.tagNumber}
-                  onChange={(e) => handleChange("tagNumber", e.target.value)}
-                  placeholder="e.g., A001"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
@@ -110,9 +95,7 @@ export function AddCattle() {
                   placeholder="e.g., Bessie"
                 />
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="breed">Breed *</Label>
                 <Select
@@ -160,19 +143,6 @@ export function AddCattle() {
                   required
                   value={formData.dateOfBirth}
                   onChange={(e) => handleChange("dateOfBirth", e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="weight">Weight (kg)</Label>
-                <Input
-                  id="weight"
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  value={formData.weight}
-                  onChange={(e) => handleChange("weight", e.target.value)}
-                  placeholder="e.g., 500"
                 />
               </div>
             </div>
