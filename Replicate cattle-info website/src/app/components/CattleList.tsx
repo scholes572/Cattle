@@ -163,8 +163,9 @@ export function CattleList() {
                   <img
                     src={animal.imageUrl}
                     alt={animal.name || animal.tagNumber}
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-cover object-center cursor-pointer"
                     loading="lazy"
+                    onClick={() => window.open(animal.imageUrl, '_blank')}
                   />
                 </div>
               )}
