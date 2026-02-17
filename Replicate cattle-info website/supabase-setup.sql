@@ -1,7 +1,7 @@
 -- Create cattle table
 CREATE TABLE IF NOT EXISTS cattle (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  tag_number TEXT NOT NULL,
+  tag_number TEXT,
   name TEXT,
   breed TEXT,
   gender TEXT,
@@ -65,8 +65,45 @@ ALTER TABLE milk ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activity ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
--- Allow all operations (for this app)
-CREATE POLICY "Allow all" ON cattle FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all" ON milk FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all" ON activity FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all" ON users FOR ALL USING (true) WITH CHECK (true);
+-- Allow all users to see and edit all data (for shared access)
+DROP POLICY IF EXISTS "Allow all" ON cattle;
+DROP POLICY IF EXISTS "Allow all" ON milk;
+DROP POLICY IF EXISTS "Allow all" ON activity;
+
+CREATE POLICY "Allow all for cattle" ON cattle FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for milk" ON milk FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for activity" ON activity FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for users" ON users FOR ALL USING (true) WITH CHECK (true);
+
+-- Create storage bucket for cattle images (ignore if exists)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('cattle-images', 'cattle-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Allow public read access to all images
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
+CREATE POLICY "Public Access" 
+ON storage.objects 
+FOR SELECT 
+USING ( bucket_id = 'cattle-images' );
+
+-- Allow any user to upload images
+DROP POLICY IF EXISTS "Allow All Uploads" ON storage.objects;
+CREATE POLICY "Allow All Uploads" 
+ON storage.objects 
+FOR INSERT 
+WITH CHECK ( bucket_id = 'cattle-images' );
+
+-- Allow any user to update images
+DROP POLICY IF EXISTS "Allow All Updates" ON storage.objects;
+CREATE POLICY "Allow All Updates" 
+ON storage.objects 
+FOR UPDATE 
+USING ( bucket_id = 'cattle-images' );
+
+-- Allow any user to delete images
+DROP POLICY IF EXISTS "Allow All Deletes" ON storage.objects;
+CREATE POLICY "Allow All Deletes" 
+ON storage.objects 
+FOR DELETE 
+USING ( bucket_id = 'cattle-images' );
