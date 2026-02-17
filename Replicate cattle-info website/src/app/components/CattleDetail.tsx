@@ -159,20 +159,13 @@ export function CattleDetail() {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${API_URL}/cattle/${id}`, {
-        method: "DELETE",
-        headers: {
-          ...(token && { "Authorization": `Bearer ${token}` }),
-        },
-      });
+      const response = await cattleApi.delete(id || '');
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         toast.success("Cattle deleted successfully!");
         navigate("/cattle");
       } else {
-        toast.error("Failed to delete cattle: " + data.error);
+        toast.error("Failed to delete cattle: " + response.error);
       }
     } catch (error) {
       console.error("Failed to delete cattle:", error);
@@ -191,47 +184,21 @@ export function CattleDetail() {
     setImagePreview(URL.createObjectURL(file));
     setUploadingImage(true);
 
-    const uploadFormData = new FormData();
-    uploadFormData.append("file", file);
+    // For now, we'll just use the local preview URL
+    // Users can paste an image URL instead
+    const newFormData = {
+      ...formData,
+      imageUrl: URL.createObjectURL(file),
+      imagePath: "",
+    };
+    setFormData(newFormData);
+    toast.success("Image preview set - click Save to store");
+    setUploadingImage(false);
+  };
 
-    try {
-      const response = await fetch(`${API_URL}/upload-image`, {
-        method: "POST",
-        body: uploadFormData,
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        const newFormData = {
-          ...formData,
-          imageUrl: data.imageUrl,
-          imagePath: data.imagePath,
-        };
-        setFormData(newFormData);
-        
-        // Save to local server
-        await fetch(`${API_URL}/cattle/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newFormData),
-        });
-        
-        toast.success("Image uploaded successfully!");
-        if (cattle) {
-          setCattle({ ...cattle, imageUrl: data.imageUrl, imagePath: data.imagePath });
-        }
-      } else {
-        toast.error("Failed to upload image: " + data.error);
-      }
-    } catch (error) {
-      console.error("Failed to upload image:", error);
-      toast.error("Failed to upload image");
-    } finally {
-      setUploadingImage(false);
-    }
+  const handleImageUrlChange = (url: string) => {
+    setFormData({ ...formData, imageUrl: url, imagePath: "" });
+    setImagePreview(url);
   };
 
   const removeImage = async () => {
@@ -239,14 +206,8 @@ export function CattleDetail() {
     setFormData(newFormData);
     setImagePreview(null);
     
-    // Update cattle record on local server
-    await fetch(`${API_URL}/cattle/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newFormData),
-    });
+    // Update cattle record
+    await cattleApi.update(id || '', newFormData);
     
     toast.success("Image removed");
     if (cattle) {
