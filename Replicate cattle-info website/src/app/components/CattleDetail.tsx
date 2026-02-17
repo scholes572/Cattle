@@ -273,6 +273,7 @@ export function CattleDetail() {
     "Angus",
     "Hereford",
     "Holstein",
+    "Fresian",
     "Jersey",
     "Simmental",
     "Charolais",
@@ -435,16 +436,6 @@ export function CattleDetail() {
                   <TabsContent value="basic" className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="tagNumber">Tag Number</Label>
-                        <Input
-                          id="tagNumber"
-                          required
-                          value={formData.tagNumber || ""}
-                          onChange={(e) => handleChange("tagNumber", e.target.value)}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
                         <Input
                           id="name"
@@ -496,17 +487,6 @@ export function CattleDetail() {
                           required
                           value={formData.dateOfBirth || ""}
                           onChange={(e) => handleChange("dateOfBirth", e.target.value)}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="weight">Weight (kg)</Label>
-                        <Input
-                          id="weight"
-                          type="number"
-                          step="0.1"
-                          value={formData.weight || ""}
-                          onChange={(e) => handleChange("weight", e.target.value)}
                         />
                       </div>
 
