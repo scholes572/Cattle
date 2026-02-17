@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "./ui/alert-dialog";
-import { cattleApi, milkApi } from "../api";
+import { cattleApi, milkApi, storageApi } from "../api";
 import { toast } from "sonner";
 
 interface Cattle {
@@ -184,16 +184,44 @@ export function CattleDetail() {
     setImagePreview(URL.createObjectURL(file));
     setUploadingImage(true);
 
-    // For now, we'll just use the local preview URL
-    // Users can paste an image URL instead
-    const newFormData = {
-      ...formData,
-      imageUrl: URL.createObjectURL(file),
-      imagePath: "",
-    };
-    setFormData(newFormData);
-    toast.success("Image preview set - click Save to store");
-    setUploadingImage(false);
+    try {
+      // Get the cattle ID (use existing id or generate a temp one for new cattle)
+      const cattleId = id || `new-${Date.now()}`;
+      
+      // Upload to Supabase Storage
+      const result = await storageApi.uploadImage(file, cattleId);
+      
+      if (result.success && result.url) {
+        const newFormData = {
+          ...formData,
+          imageUrl: result.url,
+          imagePath: "",
+        };
+        setFormData(newFormData);
+        toast.success("Image uploaded successfully!");
+      } else {
+        toast.error("Failed to upload image: " + (result.error || "Unknown error"));
+        // Fall back to local preview if upload fails
+        const newFormData = {
+          ...formData,
+          imageUrl: URL.createObjectURL(file),
+          imagePath: "",
+        };
+        setFormData(newFormData);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload image");
+      // Fall back to local preview
+      const newFormData = {
+        ...formData,
+        imageUrl: URL.createObjectURL(file),
+        imagePath: "",
+      };
+      setFormData(newFormData);
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleImageUrlChange = (url: string) => {

@@ -375,3 +375,60 @@ export const dataApi = {
     return { success: true, data };
   }
 };
+
+// ==================== Storage API for Images ====================
+export const storageApi = {
+  uploadImage: async (file: File, cattleId: string): Promise<{ success: boolean; url?: string; error?: string }> => {
+    try {
+      // Generate unique filename
+      const timestamp = Date.now();
+      const extension = file.name.split('.').pop() || 'jpg';
+      const fileName = `${cattleId}-${timestamp}.${extension}`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('cattle-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+      
+      if (error) {
+        console.error('Upload error:', error);
+        return { success: false, error: error.message };
+      }
+      
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('cattle-images')
+        .getPublicUrl(fileName);
+      
+      return { success: true, url: urlData.publicUrl };
+    } catch (error) {
+      console.error('Upload error:', error);
+      return { success: false, error: 'Failed to upload image' };
+    }
+  },
+  
+  deleteImage: async (imageUrl: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      // Extract filename from URL
+      const urlParts = imageUrl.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      
+      const { error } = await supabase.storage
+        .from('cattle-images')
+        .remove([fileName]);
+      
+      if (error) {
+        console.error('Delete error:', error);
+        return { success: false, error: error.message };
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Delete error:', error);
+      return { success: false, error: 'Failed to delete image' };
+    }
+  }
+};
