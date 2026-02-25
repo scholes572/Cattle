@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 import { cattleApi, milkApi, storageApi } from "../api";
+import { PregnancyTracker } from "./PregnancyTracker";
 import { toast } from "sonner";
 
 interface Cattle {
@@ -423,12 +424,16 @@ export function CattleDetail() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="basic">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="basic">Basic Info</TabsTrigger>
                   <TabsTrigger value="lineage">Lineage & Notes</TabsTrigger>
                   <TabsTrigger value="milk" disabled={cattle?.gender !== "female"}>
                     <Droplets className="h-4 w-4 mr-1" />
                     Milk
+                  </TabsTrigger>
+                  <TabsTrigger value="pregnancy" disabled={cattle?.gender !== "female"}>
+                    <Droplets className="h-4 w-4 mr-1" />
+                    Pregnancy
                   </TabsTrigger>
                 </TabsList>
 
@@ -716,6 +721,15 @@ export function CattleDetail() {
                           </CardContent>
                         </Card>
                       </>
+                    )}
+                  </TabsContent>
+
+                  {/* Pregnancy Tab */}
+                  <TabsContent value="pregnancy" className="space-y-6">
+                    {cattle?.gender !== "female" ? (
+                      <p className="text-gray-500">Pregnancy tracking is only available for female cattle.</p>
+                    ) : (
+                      <PregnancyTracker cattleId={cattle.id} cattleName={cattle.name} />
                     )}
                   </TabsContent>
                 </form>

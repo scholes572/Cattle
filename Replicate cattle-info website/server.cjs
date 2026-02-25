@@ -36,6 +36,7 @@ const CATTLE_FILE = path.join(DATA_DIR, 'cattle.json');
 const MILK_FILE = path.join(DATA_DIR, 'milk.json');
 const ACTIVITY_FILE = path.join(DATA_DIR, 'activity.json');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const PREGNANCY_FILE = path.join(DATA_DIR, 'pregnancy.json');
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {

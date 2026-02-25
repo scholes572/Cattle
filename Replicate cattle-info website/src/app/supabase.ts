@@ -432,3 +432,89 @@ export const storageApi = {
     }
   }
 };
+
+// ==================== Pregnancy API ====================
+export const pregnancyApi = {
+  getAll: async (cattleId?: string): Promise<ApiResponse> => {
+    let query = supabase
+      .from('pregnancy')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (cattleId) {
+      query = query.eq('cattle_id', cattleId);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) return { success: false, error: error.message };
+    
+    const records = (data || []).map(p => ({
+      id: p.id,
+      cattleId: p.cattle_id,
+      servedDate: p.served_date,
+      servedBreed: p.served_breed,
+      expectedBirthDate: p.expected_birth_date,
+      driedDate: p.dried_date,
+      actualBirthDate: p.actual_birth_date,
+      calfGender: p.calf_gender,
+      calfName: p.calf_name,
+      createdAt: p.created_at,
+      updatedAt: p.updated_at
+    }));
+    
+    return { success: true, records };
+  },
+  
+  create: async (data: unknown): Promise<ApiResponse> => {
+    const pregnancyData = data as Record<string, unknown>;
+    const id = generateId();
+    const now = new Date().toISOString();
+    
+    const { error } = await supabase.from('pregnancy').insert({
+      id,
+      cattle_id: pregnancyData.cattleId,
+      served_date: pregnancyData.servedDate,
+      served_breed: pregnancyData.servedBreed,
+      expected_birth_date: pregnancyData.expectedBirthDate,
+      dried_date: pregnancyData.driedDate,
+      actual_birth_date: pregnancyData.actualBirthDate,
+      calf_gender: pregnancyData.calfGender,
+      calf_name: pregnancyData.calfName,
+      created_at: now,
+      updated_at: now
+    });
+    
+    if (error) return { success: false, error: error.message };
+    
+    return { success: true };
+  },
+  
+  update: async (id: string, data: unknown): Promise<ApiResponse> => {
+    const pregnancyData = data as Record<string, unknown>;
+    const now = new Date().toISOString();
+    
+    const { error } = await supabase.from('pregnancy').update({
+      served_date: pregnancyData.servedDate,
+      served_breed: pregnancyData.servedBreed,
+      expected_birth_date: pregnancyData.expectedBirthDate,
+      dried_date: pregnancyData.driedDate,
+      actual_birth_date: pregnancyData.actualBirthDate,
+      calf_gender: pregnancyData.calfGender,
+      calf_name: pregnancyData.calfName,
+      updated_at: now
+    }).eq('id', id);
+    
+    if (error) return { success: false, error: error.message };
+    
+    return { success: true };
+  },
+  
+  delete: async (id: string): Promise<ApiResponse> => {
+    const { error } = await supabase.from('pregnancy').delete().eq('id', id);
+    
+    if (error) return { success: false, error: error.message };
+    
+    return { success: true };
+  }
+};
