@@ -143,9 +143,9 @@ export function PregnancyTracker({ cattleId, cattleName }: PregnancyTrackerProps
           <Baby className="h-5 w-5 text-pink-600" />
           Pregnancy & Birth History - {cattleName}
         </CardTitle>
-        <Button onClick={() => setShowForm(!showForm)} size="sm">
+        <Button type="button" onClick={() => setShowForm(!showForm)} size="sm">
           <Plus className="h-4 w-4 mr-1" />
-          Add Record
+          {showForm ? 'Cancel' : 'Add Record'}
         </Button>
       </CardHeader>
       <CardContent>

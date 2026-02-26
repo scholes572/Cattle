@@ -67,7 +67,7 @@ export function CattleDetail() {
         const response = await cattleApi.getById(id || '');
         if (response.success && response.cattle) {
           setCattle(response.cattle as Cattle);
-          setFormData(response.cattle);
+          setFormData(response.cattle as Partial<Cattle>);
         } else {
           toast.error("Cattle not found");
           navigate("/cattle");
@@ -145,7 +145,7 @@ export function CattleDetail() {
 
       if (response.success) {
         setCattle(response.cattle as Cattle);
-        setFormData(response.cattle);
+        setFormData(response.cattle as Partial<Cattle>);
         toast.success("Cattle updated successfully!");
       } else {
         toast.error("Failed to update cattle: " + response.error);
@@ -437,7 +437,7 @@ export function CattleDetail() {
                   </TabsTrigger>
                 </TabsList>
 
-                <form onSubmit={handleUpdate}>
+                <div>
                   <TabsContent value="basic" className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -524,7 +524,8 @@ export function CattleDetail() {
 
                     <div className="flex gap-4">
                       <Button
-                        type="submit"
+                        type="button"
+                        onClick={handleUpdate}
                         disabled={saving}
                         className="bg-green-600 hover:bg-green-700"
                       >
@@ -570,7 +571,8 @@ export function CattleDetail() {
 
                     <div className="flex gap-4">
                       <Button
-                        type="submit"
+                        type="button"
+                        onClick={handleUpdate}
                         disabled={saving}
                         className="bg-green-600 hover:bg-green-700"
                       >
@@ -732,7 +734,7 @@ export function CattleDetail() {
                       <PregnancyTracker cattleId={cattle.id} cattleName={cattle.name} />
                     )}
                   </TabsContent>
-                </form>
+                </div>
               </Tabs>
             </CardContent>
           </Card>
