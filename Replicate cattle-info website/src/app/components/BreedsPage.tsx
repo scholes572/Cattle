@@ -129,6 +129,46 @@ export function BreedsPage() {
       weight: "450-750 kg",
       temperament: "Calm, easy to manage",
     },
+    {
+      name: "Brown Swiss",
+      purpose: "Dairy",
+      origin: "Switzerland",
+      characteristics: "Light to dark brown color, large framed, excellent milk production",
+      weight: "600-900 kg",
+      temperament: "Docile, hardy",
+    },
+    {
+      name: "Friesian",
+      purpose: "Dairy",
+      origin: "Netherlands",
+      characteristics: "Black and white markings, high milk yield, large body size",
+      weight: "600-700 kg",
+      temperament: "Gentle, adaptable",
+    },
+    {
+      name: "Guernsey",
+      purpose: "Dairy",
+      origin: "Guernsey Island, UK",
+      characteristics: "Fawn and white color, produces high quality milk with golden color",
+      weight: "450-550 kg",
+      temperament: "Docile, easy to handle",
+    },
+    {
+      name: "Ayrshire",
+      purpose: "Dairy",
+      origin: "Scotland",
+      characteristics: "Red and white markings, hardy, good feed conversion",
+      weight: "450-600 kg",
+      temperament: "Gentle, active",
+    },
+    {
+      name: "Zebu",
+      purpose: "Beef",
+      origin: "South Asia",
+      characteristics: "Hump over shoulders, large drooping ears, heat tolerant",
+      weight: "400-600 kg",
+      temperament: "Intelligent, hardy",
+    },
   ];
 
   const filteredBreeds = breeds.filter(

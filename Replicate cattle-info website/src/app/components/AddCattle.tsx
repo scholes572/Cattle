@@ -11,18 +11,25 @@ import { cattleApi } from "../api";
 import { toast } from "sonner";
 
 const commonBreeds = [
-  "Holstein",
-  "Fresian",
-  "Jersey",
   "Angus",
   "Hereford",
-  "Charolais",
-  "Limousin",
+  "Holstein",
+  "Friesian",
+  "Jersey",
   "Simmental",
+  "Charolais",
   "Brahman",
-  "Guernsey",
+  "Limousin",
+  "Gelbvieh",
+  "Red Angus",
+  "Shorthorn",
+  "Texas Longhorn",
+  "Highland",
+  "Belted Galloway",
   "Brown Swiss",
-  "Milking Shorthorn",
+  "Guernsey",
+  "Ayrshire",
+  "Zebu",
   "Other",
 ];
 
@@ -185,7 +192,7 @@ export function AddCattle() {
                   id="sire"
                   value={formData.sire}
                   onChange={(e) => handleChange("sire", e.target.value)}
-                  placeholder="Tag number or name of sire"
+                  placeholder="Name of sire"
                 />
               </div>
 
@@ -195,7 +202,7 @@ export function AddCattle() {
                   id="dam"
                   value={formData.dam}
                   onChange={(e) => handleChange("dam", e.target.value)}
-                  placeholder="Tag number or name of dam"
+                  placeholder="Name of dam"
                 />
               </div>
             </div>

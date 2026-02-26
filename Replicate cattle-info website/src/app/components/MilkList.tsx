@@ -7,6 +7,7 @@ import {
   Calendar,
   TrendingUp,
   Filter,
+  Trash2,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
@@ -57,7 +58,7 @@ export function MilkList() {
     try {
       const response = await milkApi.getAll();
       if (response.success) {
-        const records = response.records || [];
+        const records = (response.records || []) as MilkProduction[];
         setMilkRecords(records);
         calculateDailyTotals(records);
         calculateTotalProduction(records);
@@ -282,81 +283,80 @@ export function MilkList() {
               </Link>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">
-                      Date
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">
-                      Cow
-                    </th>
-                    <th className="text-right py-3 px-4 font-medium text-gray-600">
-                      Morning
-                    </th>
-                    <th className="text-right py-3 px-4 font-medium text-gray-600">
-                      Evening
-                    </th>
-                    <th className="text-right py-3 px-4 font-medium text-gray-600">
-                      Total
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">
-                      Notes
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRecords
-                    .sort(
-                      (a, b) =>
-                        new Date(b.date).getTime() - new Date(a.date).getTime()
-                    )
-                    .map((record) => (
-                      <tr
-                        key={record.id}
-                        className="border-b hover:bg-gray-50"
-                      >
-                        <td className="py-3 px-4">
-                          {new Date(record.date).toLocaleDateString()}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Link
-                            to={`/cattle/${record.cattleId}`}
-                            className="text-green-600 hover:underline"
-                          >
-                            {record.cattleTagNumber} - {record.cattleName}
-                          </Link>
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          {record.morningLiters.toFixed(1)} L
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          {record.eveningLiters.toFixed(1)} L
-                        </td>
-                        <td className="py-3 px-4 text-right font-medium text-green-600">
-                          {record.totalLiters.toFixed(1)} L
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-500">
-                          {record.notes || "-"}
-                        </td>
-                        <td className="py-3 px-4">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteRecord(record.id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            Delete
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+            <div className="space-y-4">
+              {filteredRecords
+                .sort(
+                  (a, b) =>
+                    new Date(b.date).getTime() - new Date(a.date).getTime()
+                )
+                .map((record) => (
+                  <div
+                    key={record.id}
+                    className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex flex-col space-y-3">
+                      {/* Date and Cow Info */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="h-4 w-4 text-gray-400" />
+                          <span className="font-medium text-gray-900">
+                            {new Date(record.date).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <Link
+                          to={`/cattle/${record.cattleId}`}
+                          className="text-green-600 hover:underline text-sm font-medium"
+                        >
+                          {record.cattleTagNumber} - {record.cattleName}
+                        </Link>
+                      </div>
+
+                      {/* Production Details */}
+                      <div className="grid grid-cols-3 gap-4 bg-green-50 rounded-lg p-3">
+                        <div className="text-center">
+                          <p className="text-xs text-gray-500 uppercase tracking-wide">Morning</p>
+                          <p className="text-lg font-semibold text-gray-700">
+                            {record.morningLiters.toFixed(1)} L
+                          </p>
+                        </div>
+                        <div className="text-center border-l border-r border-green-200">
+                          <p className="text-xs text-gray-500 uppercase tracking-wide">Evening</p>
+                          <p className="text-lg font-semibold text-gray-700">
+                            {record.eveningLiters.toFixed(1)} L
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-green-600 uppercase tracking-wide font-medium">Total</p>
+                          <p className="text-xl font-bold text-green-600">
+                            {record.totalLiters.toFixed(1)} L
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Notes and Actions */}
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <div className="text-sm text-gray-500 flex-1 pr-4">
+                          {record.notes ? (
+                            <span className="italic bg-yellow-50 px-2 py-1 rounded">
+                              "{record.notes}"
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">No notes</span>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteRecord(record.id)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          title="Delete record"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
             </div>
           )}
         </CardContent>

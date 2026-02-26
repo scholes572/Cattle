@@ -177,7 +177,7 @@ export function CattleList() {
                       {animal.name || "Unnamed"}
                     </CardTitle>
                     <CardDescription className="mt-1">
-                      Tag: {animal.tagNumber}
+                      {animal.status === "active" ? "Active" : "Inactive"}
                     </CardDescription>
                   </div>
                   <Badge className={getStatusColor(animal.status)}>

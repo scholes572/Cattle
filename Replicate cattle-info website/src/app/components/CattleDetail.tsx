@@ -274,7 +274,7 @@ export function CattleDetail() {
     "Angus",
     "Hereford",
     "Holstein",
-    "Fresian",
+    "Friesian",
     "Jersey",
     "Simmental",
     "Charolais",
@@ -286,6 +286,10 @@ export function CattleDetail() {
     "Texas Longhorn",
     "Highland",
     "Belted Galloway",
+    "Brown Swiss",
+    "Guernsey",
+    "Ayrshire",
+    "Zebu",
     "Other",
   ];
 
@@ -303,7 +307,7 @@ export function CattleDetail() {
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-2xl">{cattle.name || "Unnamed"}</CardTitle>
-                  <CardDescription>Tag: {cattle.tagNumber}</CardDescription>
+                  <CardDescription>{cattle.breed}</CardDescription>
                 </div>
                 <Badge className={
                   cattle.status === "active"
@@ -543,7 +547,7 @@ export function CattleDetail() {
                           id="sire"
                           value={formData.sire || ""}
                           onChange={(e) => handleChange("sire", e.target.value)}
-                          placeholder="Tag number or name"
+                          placeholder="Name"
                         />
                       </div>
 
@@ -553,7 +557,7 @@ export function CattleDetail() {
                           id="dam"
                           value={formData.dam || ""}
                           onChange={(e) => handleChange("dam", e.target.value)}
-                          placeholder="Tag number or name"
+                          placeholder="Name"
                         />
                       </div>
                     </div>

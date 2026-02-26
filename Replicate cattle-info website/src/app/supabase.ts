@@ -17,6 +17,7 @@ export interface ApiResponse<T = unknown> {
   error?: string;
   message?: string;
   cattle?: T;
+  record?: T;
   records?: T[];
   activities?: T[];
   data?: T;

@@ -10,7 +10,6 @@ import { MilkList } from "./components/MilkList";
 import { DataPage } from "./components/DataPage";
 import { ActivityLog } from "./components/ActivityLog";
 import { Login } from "./components/Login";
-import { Signup } from "./components/Signup";
 import { NotFound } from "./components/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -40,7 +39,6 @@ export const router = createBrowserRouter([
     path: "/auth",
     children: [
       { path: "login", Component: Login },
-      { path: "signup", Component: Signup },
     ],
   },
 ]);
