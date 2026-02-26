@@ -117,8 +117,8 @@ export function MilkList() {
     const cattleMatch =
       !filterCattle ||
       record.cattleId === filterCattle ||
-      record.cattleTagNumber.toLowerCase().includes(filterCattle.toLowerCase()) ||
-      record.cattleName.toLowerCase().includes(filterCattle.toLowerCase());
+      (record.cattleTagNumber?.toLowerCase() || "").includes(filterCattle.toLowerCase()) ||
+      (record.cattleName?.toLowerCase() || "").includes(filterCattle.toLowerCase());
     return dateMatch && cattleMatch;
   });
 

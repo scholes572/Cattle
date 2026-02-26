@@ -487,12 +487,29 @@ export const pregnancyApi = {
     
     if (error) return { success: false, error: error.message };
     
+    // Log activity with detailed info
+    const user = JSON.parse(atob(getAuthToken() || '{}'));
+    if (user.id) {
+      const details = [
+        `Served: ${pregnancyData.servedDate || 'not set'}`,
+        `Breed: ${pregnancyData.servedBreed || 'not set'}`,
+        `Expected Birth: ${pregnancyData.expectedBirthDate || 'not set'}`,
+        `Date Dried: ${pregnancyData.driedDate || 'not set'}`,
+        `Actual Birth: ${pregnancyData.actualBirthDate || 'not set'}`,
+        `Calf: ${pregnancyData.calfGender || 'not set'} ${pregnancyData.calfName ? `(${pregnancyData.calfName})` : ''}`
+      ].join(', ');
+      await logActivity(user.id, user.username, 'ADD_PREGNANCY', `Added pregnancy record: ${details}`);
+    }
+    
     return { success: true };
   },
   
   update: async (id: string, data: unknown): Promise<ApiResponse> => {
     const pregnancyData = data as Record<string, unknown>;
     const now = new Date().toISOString();
+    
+    // Get the old record for comparison
+    const { data: oldRecord } = await supabase.from('pregnancy').select('*').eq('id', id).single();
     
     const { error } = await supabase.from('pregnancy').update({
       served_date: pregnancyData.servedDate,
@@ -507,13 +524,61 @@ export const pregnancyApi = {
     
     if (error) return { success: false, error: error.message };
     
+    // Log activity with detailed changes
+    const user = JSON.parse(atob(getAuthToken() || '{}'));
+    if (user.id && oldRecord) {
+      const changes: string[] = [];
+      
+      if (oldRecord.served_date !== pregnancyData.servedDate) {
+        changes.push(`Served Date: ${pregnancyData.servedDate || 'not set'}`);
+      }
+      if (oldRecord.served_breed !== pregnancyData.servedBreed) {
+        changes.push(`Breed: ${pregnancyData.servedBreed || 'not set'}`);
+      }
+      if (oldRecord.expected_birth_date !== pregnancyData.expectedBirthDate) {
+        changes.push(`Expected Birth: ${pregnancyData.expectedBirthDate || 'not set'}`);
+      }
+      if (oldRecord.dried_date !== pregnancyData.driedDate) {
+        changes.push(`Date Dried: ${pregnancyData.driedDate || 'not set'}`);
+      }
+      if (oldRecord.actual_birth_date !== pregnancyData.actualBirthDate) {
+        changes.push(`Actual Birth: ${pregnancyData.actualBirthDate || 'not set'}`);
+      }
+      if (oldRecord.calf_gender !== pregnancyData.calfGender) {
+        changes.push(`Calf Gender: ${pregnancyData.calfGender || 'not set'}`);
+      }
+      if (oldRecord.calf_name !== pregnancyData.calfName) {
+        changes.push(`Calf Name: ${pregnancyData.calfName || 'not set'}`);
+      }
+      
+      const details = changes.length > 0 ? changes.join(', ') : 'No changes';
+      await logActivity(user.id, user.username, 'UPDATE_PREGNANCY', `Updated pregnancy record: ${details}`);
+    }
+    
     return { success: true };
   },
   
   delete: async (id: string): Promise<ApiResponse> => {
+    // Get the pregnancy record first for logging
+    const { data: deletedRecord } = await supabase.from('pregnancy').select('*').eq('id', id).single();
+    
     const { error } = await supabase.from('pregnancy').delete().eq('id', id);
     
     if (error) return { success: false, error: error.message };
+    
+    // Log activity with detailed deleted info
+    const user = JSON.parse(atob(getAuthToken() || '{}'));
+    if (user.id && deletedRecord) {
+      const details = [
+        `Served: ${deletedRecord.served_date || 'not set'}`,
+        `Breed: ${deletedRecord.served_breed || 'not set'}`,
+        `Expected Birth: ${deletedRecord.expected_birth_date || 'not set'}`,
+        `Date Dried: ${deletedRecord.dried_date || 'not set'}`,
+        `Actual Birth: ${deletedRecord.actual_birth_date || 'not set'}`,
+        `Calf: ${deletedRecord.calf_gender || 'not set'} ${deletedRecord.calf_name ? `(${deletedRecord.calf_name})` : ''}`
+      ].join(', ');
+      await logActivity(user.id, user.username, 'DELETE_PREGNANCY', `Deleted pregnancy record: ${details}`);
+    }
     
     return { success: true };
   }

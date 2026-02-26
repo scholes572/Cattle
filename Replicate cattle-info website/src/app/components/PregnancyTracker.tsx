@@ -151,7 +151,7 @@ export function PregnancyTracker({ cattleId, cattleName }: PregnancyTrackerProps
       <CardContent>
         {showForm && (
           <form onSubmit={handleSubmit} className="mb-6 p-4 bg-pink-50 rounded-lg space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="servedDate">Served Date</Label>
                 <Input
@@ -168,7 +168,7 @@ export function PregnancyTracker({ cattleId, cattleName }: PregnancyTrackerProps
                 />
               </div>
               <div>
-                <Label htmlFor="servedBreed">Type of Breed (Served By)</Label>
+                <Label htmlFor="servedBreed">Breed Served By</Label>
                 <Input
                   id="servedBreed"
                   type="text"
@@ -246,43 +246,55 @@ export function PregnancyTracker({ cattleId, cattleName }: PregnancyTrackerProps
         ) : records.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No pregnancy records yet. Click "Add Record" to start tracking.</p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-pink-100">
-                <TableHead className="text-pink-800"><Calendar className="h-4 w-4 inline mr-1" />Served Date</TableHead>
-                <TableHead className="text-pink-800">Breed (Served By)</TableHead>
-                <TableHead className="text-pink-800">Expected Birth</TableHead>
-                <TableHead className="text-pink-800">Date Dried</TableHead>
-                <TableHead className="text-pink-800">Actual Birth</TableHead>
-                <TableHead className="text-pink-800">Calf Gender</TableHead>
-                <TableHead className="text-pink-800">Calf Name</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <>
+            {/* Vertical Card view */}
+            <div className="space-y-4">
               {records.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>{record.servedDate || "-"}</TableCell>
-                  <TableCell>{record.servedBreed || "-"}</TableCell>
-                  <TableCell>{record.expectedBirthDate || "-"}</TableCell>
-                  <TableCell>{record.driedDate || "-"}</TableCell>
-                  <TableCell>{record.actualBirthDate || "-"}</TableCell>
-                  <TableCell className="capitalize">{record.calfGender || "-"}</TableCell>
-                  <TableCell>{record.calfName || "-"}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                <Card key={record.id} className="bg-pink-50">
+                  <CardContent className="p-4">
+                    <div className="grid grid-cols-1 gap-3 text-sm">
+                      <div>
+                        <span className="font-medium text-pink-800">1. Served Date:</span>
+                        <p>{record.servedDate || "-"}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-pink-800">2. Breed Served By:</span>
+                        <p>{record.servedBreed || "-"}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-pink-800">3. Expected Birth Date:</span>
+                        <p>{record.expectedBirthDate || "-"}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-pink-800">4. Date Dried:</span>
+                        <p>{record.driedDate || "-"}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-pink-800">5. Exact Date of Birth:</span>
+                        <p>{record.actualBirthDate || "-"}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-pink-800">6. Calf Gender:</span>
+                        <p className="capitalize">{record.calfGender || "-"}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium text-pink-800">7. Calf Name:</span>
+                        <p>{record.calfName || "-"}</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-pink-200">
                       <Button variant="ghost" size="sm" onClick={() => handleEdit(record)}>
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-4 w-4 mr-1" /> Edit
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => handleDelete(record.id)}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                        <Trash2 className="h-4 w-4 text-red-500 mr-1" /> Delete
                       </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </CardContent>
+                </Card>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>

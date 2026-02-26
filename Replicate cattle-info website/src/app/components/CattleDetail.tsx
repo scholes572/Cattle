@@ -424,16 +424,16 @@ export function CattleDetail() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="basic">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                  <TabsTrigger value="lineage">Lineage & Notes</TabsTrigger>
-                  <TabsTrigger value="milk" disabled={cattle?.gender !== "female"}>
-                    <Droplets className="h-4 w-4 mr-1" />
+                <TabsList className="flex w-full">
+                  <TabsTrigger value="basic" className="flex-1">Basic</TabsTrigger>
+                  <TabsTrigger value="lineage" className="flex-1">Lineage</TabsTrigger>
+                  <TabsTrigger value="milk" className="flex-1">
+                    <Droplets className="h-3 w-3 mr-1" />
                     Milk
                   </TabsTrigger>
-                  <TabsTrigger value="pregnancy" disabled={cattle?.gender !== "female"}>
-                    <Droplets className="h-4 w-4 mr-1" />
-                    Pregnancy
+                  <TabsTrigger value="pregnancy" className="flex-1">
+                    <Droplets className="h-3 w-3 mr-1" />
+                    Preg
                   </TabsTrigger>
                 </TabsList>
 
