@@ -140,7 +140,7 @@ export function PregnancyTracker({ cattleId, cattleName }: PregnancyTrackerProps
     <Card className="mt-6">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
-          <Baby className="h-5 w-5 text-pink-600" />
+          <Baby className="h-5 w-5 text-black" />
           Pregnancy & Birth History - {cattleName}
         </CardTitle>
         <Button type="button" onClick={() => setShowForm(!showForm)} size="sm">
@@ -150,7 +150,7 @@ export function PregnancyTracker({ cattleId, cattleName }: PregnancyTrackerProps
       </CardHeader>
       <CardContent>
         {showForm && (
-          <form onSubmit={handleSubmit} className="mb-6 p-4 bg-pink-50 rounded-lg space-y-4">
+          <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded-lg space-y-4">
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="servedDate">Served Date</Label>
@@ -231,7 +231,7 @@ export function PregnancyTracker({ cattleId, cattleName }: PregnancyTrackerProps
               </div>
             </div>
             <div className="flex gap-2">
-              <Button type="submit" className="bg-pink-600 hover:bg-pink-700">
+              <Button type="submit" className="bg-black hover:bg-gray-800">
                 {editingId ? "Update Record" : "Save Record"}
               </Button>
               <Button type="button" variant="outline" onClick={resetForm}>
@@ -250,39 +250,39 @@ export function PregnancyTracker({ cattleId, cattleName }: PregnancyTrackerProps
             {/* Vertical Card view */}
             <div className="space-y-4">
               {records.map((record) => (
-                <Card key={record.id} className="bg-pink-50">
+                <Card key={record.id} className="bg-gray-50">
                   <CardContent className="p-4">
                     <div className="grid grid-cols-1 gap-3 text-sm">
                       <div>
-                        <span className="font-medium text-pink-800">1. Served Date:</span>
+                        <span className="font-medium text-black">1. Served Date:</span>
                         <p>{record.servedDate || "-"}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-pink-800">2. Breed Served By:</span>
+                        <span className="font-medium text-black">2. Breed Served By:</span>
                         <p>{record.servedBreed || "-"}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-pink-800">3. Expected Birth Date:</span>
+                        <span className="font-medium text-black">3. Expected Birth Date:</span>
                         <p>{record.expectedBirthDate || "-"}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-pink-800">4. Date Dried:</span>
+                        <span className="font-medium text-black">4. Date Dried:</span>
                         <p>{record.driedDate || "-"}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-pink-800">5. Exact Date of Birth:</span>
+                        <span className="font-medium text-black">5. Exact Date of Birth:</span>
                         <p>{record.actualBirthDate || "-"}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-pink-800">6. Calf Gender:</span>
+                        <span className="font-medium text-black">6. Calf Gender:</span>
                         <p className="capitalize">{record.calfGender || "-"}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-pink-800">7. Calf Name:</span>
+                        <span className="font-medium text-black">7. Calf Name:</span>
                         <p>{record.calfName || "-"}</p>
                       </div>
                     </div>
-                    <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-pink-200">
+                    <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-gray-200">
                       <Button variant="ghost" size="sm" onClick={() => handleEdit(record)}>
                         <Edit className="h-4 w-4 mr-1" /> Edit
                       </Button>
